@@ -53,6 +53,7 @@ module.exports = {
     dossierHeading: 'DOSSIER',
     dossierIntro: 'Public roster derived from alliance records and org chart.',
     dossierDocumentTitle: 'DOSSIER — GOON SQUAD',
+    dossierHeroImage: '/dossier-cold.jpg',
     discordWidgetId: '1190527980120850493',
     discordWidgetTheme: 'dark',
     discordWidgetWidth: 350,

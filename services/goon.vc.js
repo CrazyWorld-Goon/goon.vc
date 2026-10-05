@@ -66,6 +66,7 @@ class GoonVC {
       dossierHeading: 'DOSSIER',
       dossierIntro: 'Public roster derived from alliance records and org chart.',
       dossierDocumentTitle: 'DOSSIER — GOON SQUAD',
+      dossierHeroImage: '/dossier-cold.jpg',
       discordWidgetId: '1190527980120850493',
       bitcoinAddress: 'bc1qx5ktkj6utjw3vl43htvn434c9kg89m73lympr0',
       copyright: '&copy; big lol'
