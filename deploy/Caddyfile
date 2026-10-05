@@ -1,0 +1,25 @@
+# Caddy reverse proxy for goon.vc — automatic HTTPS via Let's Encrypt.
+# Install: copy to /etc/caddy/Caddyfile && systemctl reload caddy
+#
+# This host is the public HTML zipper only. Do not front relay.goon.vc here —
+# that hostname is LiveRelay (star-citizen-live/docs/PRODUCTION.md).
+
+goon.vc {
+	encode gzip
+
+	reverse_proxy 127.0.0.1:8080
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+
+	log {
+		output file /var/log/caddy/goon.vc.log
+	}
+}
+
+www.goon.vc {
+	redir https://goon.vc{uri} permanent
+}

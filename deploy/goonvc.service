@@ -1,0 +1,23 @@
+[Unit]
+Description=GOON.VC — public HTML site + Hub API zipper
+Documentation=https://github.com/GoonCitizen/goon.vc
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=goonvc
+Group=goonvc
+WorkingDirectory=/opt/goon.vc
+EnvironmentFile=/opt/goon.vc/.env
+ExecStart=/usr/bin/node scripts/node.js
+Restart=on-failure
+RestartSec=5
+MemoryMax=512M
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/goon.vc/stores /opt/goon.vc/logs
+
+[Install]
+WantedBy=multi-user.target

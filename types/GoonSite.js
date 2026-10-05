@@ -4,9 +4,14 @@ const FabricSite = require('@fabric/http/types/site');
 const GoonSPA = require('./GoonSPA');
 
 /**
- * Goon.VC Site: uses GoonSPA so the HTML template is the one in types/GoonSPA.js.
+ * Bundles the GoonSPA with the FabricSite.
  */
 class GoonSite extends FabricSite {
+  /**
+   * Create an instance of the GoonSite.
+   * @param {Object} [settings] Map of settings.
+   * @param {HTTPComponent} [settings.document] Document to use.
+   */
   constructor (settings = {}) {
     super(settings);
     this.spa = new GoonSPA(this.settings);
