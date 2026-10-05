@@ -1,0 +1,71 @@
+digraph Alliance {
+  "G00N SQUAD"
+  "Infinity Industries"
+  "Doubledog Delivery, Inc."
+  "Legacy Corporation"
+  "Trade Trans-Galactic"
+  "4M Contractors"
+  "A.I.M.O.S."
+
+  "Black Exodus"
+  "GrieferNet"
+  "388"
+  "Tortuga"
+  "RUIN"
+  "TEST"
+  "NOVA"
+  "Synergy"
+  "30K"
+  "For Science"
+  "7th Fleet"
+  "Achlys-Corp"
+  "Avenger Squadron"
+  "Shadow Moses"
+  "Atlas 77"
+  "Black Squadron"
+  "Black Star Sovereignty"
+
+  "GrieferNet" -> {
+    "Tortuga"
+  }
+
+  "A.I.M.O.S." -> {
+    "Risky Business"
+  }
+
+  "PERMAFLEET" -> {
+    "G00N SQUAD"
+    "Infinity Industries"
+    "Doubledog Delivery, Inc."
+    "Legacy Corporation"
+    "Trade Trans-Galactic"
+    "4M Contractors"
+    "A.I.M.O.S."
+  }
+
+  subgraph cluster_protectorate {
+    label = "Protectorate"
+    "PERMAFLEET"
+    "G00N SQUAD"
+    "Infinity Industries"
+    "Doubledog Delivery, Inc."
+    "Legacy Corporation"
+    "Trade Trans-Galactic"
+    "4M Contractors"
+    "A.I.M.O.S."
+
+    subgraph cluster_inhouse {
+      label = "In-House"
+      "G00N SQUAD" -> {
+        "Infinity Industries"
+        "Doubledog Delivery, Inc."
+      }
+    }
+  }
+
+  subgraph cluster_neighborhood_watch {
+    label = "Neighborhood Watch"
+    "GrieferNet"
+    "Tortuga"
+  }
+}
