@@ -1,1 +1,8 @@
 node_modules
+stores
+logs
+coverage
+reports
+access.log
+.DS_Store
+.env

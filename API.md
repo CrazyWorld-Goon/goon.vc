@@ -1,41 +1,25 @@
-<a name="GoonVC"></a>
+## Classes
 
-## GoonVC : <code>Hub</code>
-GoonVC is the main service for the GoonVC application.
+<dl>
+<dt><a href="#GoonSPA">GoonSPA</a></dt>
+<dd>Public GOON SQUAD HTML template (settings/local.js <code>site.*</code>).</dd>
+<dt><a href="#GoonSite">GoonSite</a></dt>
+<dd>Bundles GoonSPA with FabricSite.</dd>
+<dt><a href="#HTMLCompiler">HTMLCompiler</a></dt>
+<dd>Writes <code>assets/index.html</code> from GoonSPA (no webpack / Hub UI).</dd>
+<dt><a href="#GoonVC">GoonVC</a></dt>
+<dd>HTML zipper: <code>@fabric/http</code> server plus Hub API reverse-proxy. Not a Hub.</dd>
+</dl>
 
-**Kind**: global class  
-**Properties**
+## Hub API zipper
 
-| Name | Type | Description |
-| --- | --- | --- |
-| settings | <code>Object</code> | Configuration settings. |
-| name | <code>String</code> | Service name. |
-| services | <code>Object</code> | Services. |
-| clients | <code>Object</code> | Clients. |
-| targets | <code>Object</code> | Targets. |
-| history | <code>Object</code> | History. |
-| origin | <code>Object</code> | Origin. |
+Same-origin paths forwarded to <code>FABRIC_HUB_ORIGIN</code> (default
+<code>https://hub.fabric.pub</code>):
 
+- <code>/sessions</code> (HTML GET stays on GoonSPA; JSON/POST proxy)
+- <code>/device-links</code>
+- <code>/services/rpc</code>
+- <code>/identity/cluster</code>, <code>/identity/cross-sign</code>
 
-* [GoonVC](#GoonVC) : <code>Hub</code>
-    * [new GoonVC([settings])](#new_GoonVC_new)
-    * [.start()](#GoonVC+start) ⇒ [<code>GoonVC</code>](#GoonVC)
-
-<a name="new_GoonVC_new"></a>
-
-### new GoonVC([settings])
-Create an instance of the [GoonVC](#GoonVC) service.
-
-**Returns**: [<code>GoonVC</code>](#GoonVC) - Instance of the [GoonVC](#GoonVC).  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| [settings] | <code>Object</code> | Settings for the GoonVC instance. |
-
-<a name="GoonVC+start"></a>
-
-### goonVC.start() ⇒ [<code>GoonVC</code>](#GoonVC)
-Start the GoonVC service.
-
-**Kind**: instance method of [<code>GoonVC</code>](#GoonVC)  
-**Returns**: [<code>GoonVC</code>](#GoonVC) - Instance of the [GoonVC](#GoonVC).  
+GoonCitizen lives at <code>https://relay.goon.vc</code>. This process does not
+mount <code>/services/star-citizen</code> and does not listen as a Fabric Peer.
