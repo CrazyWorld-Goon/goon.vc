@@ -66,11 +66,6 @@ class GoonVC {
       dossierHeading: 'DOSSIER',
       dossierIntro: 'Public roster derived from alliance records and org chart.',
       dossierDocumentTitle: 'DOSSIER — GOON SQUAD',
-      articlesPath: '/articles',
-      articlesLabel: 'ARTICLES',
-      articlesHeading: 'Articles of Incorporation',
-      articlesIntro: 'Founding instrument for PERMAFLEET (full text in Google Docs). Character dossiers also cite this document alongside PERMAFLEET SERIES.',
-      articlesDocumentTitle: 'Articles of Incorporation — GOON SQUAD',
       discordWidgetId: '1190527980120850493',
       bitcoinAddress: 'bc1qx5ktkj6utjw3vl43htvn434c9kg89m73lympr0',
       copyright: '&copy; big lol'
@@ -93,6 +88,11 @@ class GoonVC {
         hostname: process.env.FABRIC_HUB_HOSTNAME || process.env.HOSTNAME || 'goon.vc'
       },
       peers: [],
+      redirects: {
+        '/permafleet': '/operations/PERMAFLEET',
+        '/permafleet/': '/operations/PERMAFLEET',
+        '/permafleet/schedule': '/operations/PERMAFLEET/schedule'
+      },
       spaFallback: true
     }, settings);
 
@@ -150,6 +150,7 @@ class GoonVC {
       port,
       listen: this.settings.listen !== false,
       peers: [],
+      redirects: this.settings.redirects,
       spaFallback: this.settings.spaFallback !== false,
       spaFallbackExclude: /^\/(services|identity)(\/|$)/,
       jsonRpc: { enabled: false },

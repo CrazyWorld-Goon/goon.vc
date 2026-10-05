@@ -3,12 +3,12 @@
 const fs = require('fs');
 const path = require('path');
 const FabricSPA = require('@fabric/http/types/spa');
+const escapeHtml = require('../functions/escapeHtml');
+const HomePage = require('../components/HomePage');
+const PermafleetOperation = require('../components/PermafleetOperation');
+const PermafleetSchedule = require('../components/PermafleetSchedule');
 
 const PERSONALITIES_DIR = path.join(__dirname, '../contracts/permafleet/personalities');
-
-const ARTICLES_URL = 'https://docs.google.com/document/d/1r50-vh0qIZniGRXNHMV3G0aXrXij-tN-qGo19LnwAic/edit';
-
-const SERIES_URL = 'https://docs.google.com/document/d/1otjrh9vk4q4WBmOyI903H7NTGNjO0qNStpxmehgDTbU/edit';
 
 const DEFAULTS = {
   title: 'GOON SQUAD',
@@ -24,11 +24,20 @@ const DEFAULTS = {
   dossierHeading: 'DOSSIER',
   dossierIntro: 'Public roster derived from alliance records and org chart.',
   dossierDocumentTitle: 'DOSSIER — GOON SQUAD',
-  articlesPath: '/articles',
-  articlesLabel: 'ARTICLES',
-  articlesHeading: 'Articles of Incorporation',
-  articlesIntro: 'Founding instrument for PERMAFLEET (full text in Google Docs). Character dossiers also cite this document alongside PERMAFLEET SERIES.',
-  articlesDocumentTitle: 'Articles of Incorporation — GOON SQUAD',
+  permafleetPath: '/operations/PERMAFLEET',
+  permafleetLabel: 'PERMAFLEET',
+  permafleetHeading: 'PERMAFLEET',
+  permafleetTagline: 'We’re always online.',
+  permafleetIntro: 'Dedicated to giving everyone a group to fly with, PERMAFLEET runs 24/7 public assistance. Security is always on standby, giving us rapid response times to hostile encounters.',
+  permafleetDocumentTitle: 'PERMAFLEET — GOON SQUAD',
+  permafleetChannelId: '1236721094153732276',
+  permafleetChannelName: 'permafleet',
+  permafleetInviteUrl: 'https://discord.com/invite/M4h9bBWq',
+  permafleetHeroImage: '/hero-quantum.jpg',
+  permafleetSchedulePath: '/operations/PERMAFLEET/schedule',
+  permafleetScheduleImage: '/permafleet-schedule.svg',
+  permafleetScheduleHtml: '/permafleet-schedule.html',
+  permafleetScheduleDocumentTitle: 'PERMAFLEET Weekly Ops — GOON SQUAD',
   discordWidgetId: '1190527980120850493',
   discordWidgetTheme: 'dark',
   discordWidgetWidth: 350,
@@ -37,15 +46,6 @@ const DEFAULTS = {
   copyright: '&copy; big lol',
   viewport: 'width=500, initial-scale=1'
 };
-
-function escapeHtml (value) {
-  if (value == null) return '';
-  return String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
 
 function loadPersonalities () {
   let files = [];
@@ -131,7 +131,7 @@ function renderPersonMainHtml (p, dossierBasePath, loginPath, loginLabel, copyri
   const rolesHtml = renderRolesUlHtml(p);
   const sourcesFooter = renderSourcesFooterHtml(normalizeSources(p));
   return `<main id="${id}" class="person-page dossier-page">
-      <p class="dossier-back"><a href="/">&larr; Home</a> · <a href="${dossierBasePath}">Dossier index</a> · <a href="/articles">Articles</a></p>
+      <p class="dossier-back"><a href="/">&larr; Home</a> · <a href="${dossierBasePath}">Dossier index</a></p>
       <h1 class="person-title">${escapeHtml(p.handle)}</h1>
       ${org}
       ${rolesHtml}
@@ -172,13 +172,12 @@ class GoonSPA extends FabricSPA {
     const dossierHeading = escapeHtml(this._site('dossierHeading'));
     const dossierIntro = escapeHtml(this._site('dossierIntro'));
     const dossierDocumentTitle = this._site('dossierDocumentTitle');
-    const articlesPath = this._site('articlesPath');
-    const articlesLabel = escapeHtml(this._site('articlesLabel'));
-    const articlesHeading = escapeHtml(this._site('articlesHeading'));
-    const articlesIntro = escapeHtml(this._site('articlesIntro'));
-    const articlesDocumentTitle = this._site('articlesDocumentTitle');
     const dossierTitleJson = JSON.stringify(dossierDocumentTitle);
-    const articlesTitleJson = JSON.stringify(articlesDocumentTitle);
+    const permafleetPath = this._site('permafleetPath');
+    const permafleetTitleJson = JSON.stringify(this._site('permafleetDocumentTitle'));
+    const permafleetInviteUrl = this._site('permafleetInviteUrl');
+    const schedulePath = this._site('permafleetSchedulePath');
+    const scheduleTitleJson = JSON.stringify(this._site('permafleetScheduleDocumentTitle'));
     const titleJson = JSON.stringify(title);
     const personas = loadPersonalities();
     const dossierCardsHtml = renderDossierCardsHtml(personas, dossierPath);
@@ -194,6 +193,49 @@ class GoonSPA extends FabricSPA {
     const viewport = this._site('viewport');
     const widgetSrc = `https://discord.com/widget?id=${widgetId}&theme=${widgetTheme}`;
     const personPathPattern = '^' + dossierPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/([^/]+)$';
+    const homeMainHtml = HomePage.render({
+      heading,
+      nav: [
+        { href: dossierPath, label: dossierLabel },
+        { href: permafleetPath, label: escapeHtml(this._site('permafleetLabel')) },
+        { href: monitorUrl, label: monitorLabel },
+        { href: loginPath, label: 'Login' }
+      ],
+      joinUrl,
+      joinLabel,
+      widgetSrc,
+      widgetWidth,
+      widgetHeight,
+      loginPath,
+      loginLabel,
+      bitcoinAddress,
+      copyright
+    });
+    const permafleetMainHtml = PermafleetOperation.render({
+      heading: escapeHtml(this._site('permafleetHeading')),
+      tagline: escapeHtml(this._site('permafleetTagline')),
+      intro: escapeHtml(this._site('permafleetIntro')),
+      inviteUrl: permafleetInviteUrl,
+      hotlineUrl: joinUrl,
+      dossierPath,
+      dossierLabel,
+      schedulePath,
+      bitcoinAddress,
+      copyright
+    });
+    const scheduleMainHtml = PermafleetSchedule.render({
+      title: 'PERMAFLEET',
+      imageSrc: this._site('permafleetScheduleImage'),
+      htmlSrc: this._site('permafleetScheduleHtml'),
+      operationPath: permafleetPath,
+      joinUrl: permafleetInviteUrl
+    });
+    const permafleetScript = PermafleetOperation.script({
+      guildId: widgetId,
+      channelId: this._site('permafleetChannelId'),
+      channelName: this._site('permafleetChannelName'),
+      inviteUrl: permafleetInviteUrl
+    });
 
     return `<html>
   <head>
@@ -205,7 +247,7 @@ class GoonSPA extends FabricSPA {
     <meta name="viewport" content="${viewport}" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style type="text/css">
       body { background: #333; color: #ddd; text-align: center; }
       h1, h2, h3 { font-family: "Bungee", sans-serif; font-weight: 400; font-style: normal; }
@@ -223,7 +265,6 @@ class GoonSPA extends FabricSPA {
       }
       .footer-login-button:hover { background: rgba(255, 255, 255, 0.1); }
       .login-page { display: none; margin: 3em auto; max-width: 32em; padding: 0 1em; }
-      .home-page { display: block; }
       .session-form { margin: 2em auto; max-width: 26em; display: flex; flex-direction: column; gap: 0.75em; }
       .session-form button {
         background: #222;
@@ -248,33 +289,6 @@ class GoonSPA extends FabricSPA {
         display: none;
       }
       .session-identity code { word-break: break-all; font-size: 0.85em; }
-      .site-nav {
-        font-family: "Bungee", sans-serif;
-        letter-spacing: 0.06em;
-        margin: 0.35em 0 1.25em;
-      }
-      .site-nav a {
-        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-        text-decoration: none;
-      }
-      .site-nav a:hover { border-bottom-color: #fff; }
-      .articles-page {
-        display: none;
-        margin: 0 auto;
-        max-width: 38em;
-        padding: 0 1em 3em;
-        text-align: left;
-      }
-      .articles-page > h1 { text-align: center; }
-      .articles-doc-link {
-        display: inline-block;
-        margin-top: 1.25em;
-        font-family: "Bungee", sans-serif;
-        letter-spacing: 0.05em;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-        text-decoration: none;
-      }
-      .articles-doc-link:hover { border-bottom-color: #fff; }
       .dossier-page {
         display: none;
         margin: 0 auto;
@@ -328,21 +342,13 @@ class GoonSPA extends FabricSPA {
       .muted { color: #777; }
       .person-title { text-align: center; margin-top: 0; }
       .person-permalink { font-size: 0.85rem; margin-top: 1.25rem; color: #999; }
+${HomePage.styles()}
+${PermafleetOperation.styles({ heroImage: this._site('permafleetHeroImage') })}
+${PermafleetSchedule.styles()}
     </style>
   </head>
   <body>
-    <main id="home-page" class="home-page">
-      <h1>${heading}</h1>
-      <p class="site-nav"><a href="${dossierPath}">${dossierLabel}</a> · <a href="${articlesPath}">${articlesLabel}</a> · <a href="${escapeHtml(monitorUrl)}">${monitorLabel}</a> · <a href="${loginPath}">Login</a></p>
-      <h3><a href="${joinUrl}">${joinLabel}</a></h3>
-      <iframe src="${widgetSrc}" width="${widgetWidth}" height="${widgetHeight}" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-      <footer>
-        <div><h3><a href="${joinUrl}">${joinLabel}</a></h3></div>
-        <div><a class="footer-login-button" href="${loginPath}">${loginLabel}</a></div>
-        <div><code>${bitcoinAddress}</code></div>
-        <div><small>${copyright}</small></div>
-      </footer>
-    </main>
+    ${homeMainHtml}
     <main id="login-page" class="login-page">
       <h1>${loginLabel}</h1>
       <p>Sign in with your Fabric identity — GoonCitizen desktop or Fabric Passport. Same key, interchangeable.</p>
@@ -354,23 +360,8 @@ class GoonSPA extends FabricSPA {
       <div id="session-identity" class="session-identity"></div>
       <p><a href="/">Back to Home</a></p>
     </main>
-    <main id="articles-page" class="articles-page">
-      <p class="dossier-back"><a href="/">&larr; Home</a> · <a href="${dossierPath}">Dossier index</a></p>
-      <h1>${articlesHeading}</h1>
-      <p class="dossier-intro">${articlesIntro}</p>
-      <p style="text-align:center;">
-        <a class="articles-doc-link" href="${escapeHtml(ARTICLES_URL)}" rel="noopener noreferrer">Articles of Incorporation (Google Docs)</a>
-      </p>
-      <p style="text-align:center; margin-top: 1em;">
-        <a class="articles-doc-link" href="${escapeHtml(SERIES_URL)}" rel="noopener noreferrer">PERMAFLEET SERIES (Google Docs)</a>
-      </p>
-      <footer>
-        <div style="padding-top: 2em;"><a class="footer-login-button" href="${loginPath}">${loginLabel}</a></div>
-        <div><small>${copyright}</small></div>
-      </footer>
-    </main>
     <main id="dossier-page" class="dossier-page">
-      <p class="dossier-back"><a href="/">&larr; Home</a> · <a href="${articlesPath}">${articlesLabel}</a></p>
+      <p class="dossier-back"><a href="/">&larr; Home</a></p>
       <h1>${dossierHeading}</h1>
       <p class="dossier-intro">${dossierIntro}</p>
       <div class="dossier-grid">
@@ -382,30 +373,38 @@ ${dossierCardsHtml}
       </footer>
     </main>
 ${personMainsHtml}
+    ${permafleetMainHtml}
+    ${scheduleMainHtml}
     <script type="text/javascript">
       (function () {
         var loginPath = ${JSON.stringify(loginPath)};
         var dossierPath = ${JSON.stringify(dossierPath)};
-        var articlesPath = ${JSON.stringify(articlesPath)};
+        var permafleetPath = ${JSON.stringify(permafleetPath)};
+        var schedulePath = ${JSON.stringify(schedulePath)};
         var personRe = new RegExp(${JSON.stringify(personPathPattern)});
         var path = (window.location.pathname || '/').replace(/\\/+$/, '') || '/';
         var isLogin = path === loginPath;
         var isDossier = path === dossierPath;
-        var isArticles = path === articlesPath;
+        var isPermafleet = path.toLowerCase() === permafleetPath.toLowerCase();
+        var isSchedule = path.toLowerCase() === schedulePath.toLowerCase();
         var personMatch = personRe.exec(path);
         var personId = personMatch ? ('person-' + decodeURIComponent(personMatch[1])) : null;
         var home = document.getElementById('home-page');
         var login = document.getElementById('login-page');
         var dossierEl = document.getElementById('dossier-page');
-        var articlesEl = document.getElementById('articles-page');
+        var permafleetEl = document.getElementById('operation-permafleet');
+        var scheduleEl = document.getElementById('permafleet-schedule');
         var personEl = personId ? document.getElementById(personId) : null;
 
         if (home) {
-          home.style.display = (!isLogin && !isDossier && !isArticles && !personEl) ? 'block' : 'none';
+          home.style.display = (!isLogin && !isDossier && !isPermafleet && !isSchedule && !personEl) ? 'block' : 'none';
         }
         if (login) login.style.display = isLogin ? 'block' : 'none';
         if (dossierEl) dossierEl.style.display = isDossier ? 'block' : 'none';
-        if (articlesEl) articlesEl.style.display = isArticles ? 'block' : 'none';
+        if (permafleetEl) permafleetEl.style.display = isPermafleet ? 'block' : 'none';
+        document.body.classList.toggle('op-active', isPermafleet);
+        if (scheduleEl) scheduleEl.style.display = isSchedule ? 'block' : 'none';
+        document.body.classList.toggle('schedule-active', isSchedule);
         document.querySelectorAll('.person-page').forEach(function (el) {
           el.style.display = (personEl && el.id === personId) ? 'block' : 'none';
         });
@@ -413,7 +412,8 @@ ${personMainsHtml}
         if (personEl && personMatch) {
           document.title = decodeURIComponent(personMatch[1]) + ' — GOON SQUAD';
         } else if (isDossier) document.title = ${dossierTitleJson};
-        else if (isArticles) document.title = ${articlesTitleJson};
+        else if (isPermafleet) document.title = ${permafleetTitleJson};
+        else if (isSchedule) document.title = ${scheduleTitleJson};
         else document.title = ${titleJson};
 
         var status = document.getElementById('session-status');
@@ -423,7 +423,8 @@ ${personMainsHtml}
 
         function setLoginCtAsVisible (visible) {
           document.querySelectorAll('a.footer-login-button, .site-nav a[href="' + loginPath + '"]').forEach(function (el) {
-            el.style.display = visible ? '' : 'none';
+            var target = el.closest('.site-nav-item') || el;
+            target.style.display = visible ? '' : 'none';
           });
           if (btnDesktop) btnDesktop.disabled = !visible;
           if (btnPassport) btnPassport.disabled = !visible;
@@ -620,6 +621,7 @@ ${personMainsHtml}
         } catch (e) {}
       })();
     </script>
+    ${permafleetScript}
   </body>
 </html>
 `;
