@@ -213,15 +213,20 @@ class GoonSPA extends FabricSPA {
     });
     const permafleetMainHtml = PermafleetOperation.render({
       heading: escapeHtml(this._site('permafleetHeading')),
+      goonBrandHtml: heading,
       tagline: escapeHtml(this._site('permafleetTagline')),
       intro: escapeHtml(this._site('permafleetIntro')),
       inviteUrl: permafleetInviteUrl,
       hotlineUrl: joinUrl,
-      dossierPath,
-      dossierLabel,
       schedulePath,
       bitcoinAddress,
-      copyright
+      copyright,
+      nav: [
+        { href: dossierPath, label: dossierLabel },
+        { href: schedulePath, label: 'Schedule' },
+        { href: monitorUrl, label: monitorLabel },
+        { href: loginPath, label: 'Login' }
+      ]
     });
     const scheduleMainHtml = PermafleetSchedule.render({
       title: 'PERMAFLEET',
@@ -385,7 +390,8 @@ ${personMainsHtml}
         var path = (window.location.pathname || '/').replace(/\\/+$/, '') || '/';
         var isLogin = path === loginPath;
         var isDossier = path === dossierPath;
-        var isPermafleet = path.toLowerCase() === permafleetPath.toLowerCase();
+        var isRoot = path === '/';
+        var isPermafleet = isRoot || path.toLowerCase() === permafleetPath.toLowerCase();
         var isSchedule = path.toLowerCase() === schedulePath.toLowerCase();
         var personMatch = personRe.exec(path);
         var personId = personMatch ? ('person-' + decodeURIComponent(personMatch[1])) : null;

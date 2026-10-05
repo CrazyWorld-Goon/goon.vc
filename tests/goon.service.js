@@ -283,6 +283,22 @@ describe('goon.vc HTTP', function () {
     assert.strictEqual(res.location, '/operations/PERMAFLEET');
   });
 
+  it('redirects / to the PERMAFLEET operation page', async function () {
+    const res = await new Promise((resolve, reject) => {
+      http.get({
+        hostname: '127.0.0.1',
+        port: sitePort,
+        path: '/',
+        headers: { Accept: 'text/html' }
+      }, (incoming) => {
+        incoming.resume();
+        resolve({ status: incoming.statusCode, location: incoming.headers.location });
+      }).on('error', reject);
+    });
+    assert.strictEqual(res.status, 302);
+    assert.strictEqual(res.location, '/operations/PERMAFLEET');
+  });
+
   it('proxies POST /sessions to the Hub', async function () {
     const res = await fetchJson('/sessions', {
       method: 'POST',

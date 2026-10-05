@@ -89,6 +89,7 @@ class GoonVC {
       },
       peers: [],
       redirects: {
+        '/': '/operations/PERMAFLEET',
         '/permafleet': '/operations/PERMAFLEET',
         '/permafleet/': '/operations/PERMAFLEET',
         '/permafleet/schedule': '/operations/PERMAFLEET/schedule'

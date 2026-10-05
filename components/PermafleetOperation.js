@@ -99,12 +99,23 @@ function renderPermafleetCss (props) {
       .op-nav {
         position: relative;
         z-index: 3;
-        padding: 1rem 1.25rem 0;
-        font-size: 0.9rem;
+        padding: 1.1rem 1.25rem 0;
+        font-size: 0.95rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         text-align: center;
+        color: rgba(232, 244, 255, 0.92);
       }
+      .op-nav.site-nav {
+        font-family: "Bungee", sans-serif;
+        margin: 0;
+      }
+      .op-nav.site-nav a {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+        color: #fff;
+        text-decoration: none;
+      }
+      .op-nav.site-nav a:hover { border-bottom-color: var(--op-cyan); color: var(--op-cyan-soft); }
       .op-content {
         position: relative;
         z-index: 3;
@@ -117,7 +128,8 @@ function renderPermafleetCss (props) {
         text-align: center;
       }
       .op-brand {
-        margin: 0;
+        position: relative;
+        margin: 0 auto;
         font-family: "Bungee", sans-serif;
         font-weight: 400;
         font-size: clamp(2.4rem, 7vw, 4.2rem);
@@ -125,6 +137,25 @@ function renderPermafleetCss (props) {
         line-height: 1.05;
         color: #fff;
         text-shadow: 0 0 24px rgba(142, 191, 208, 0.28), 0 2px 18px rgba(0, 0, 0, 0.65);
+        height: 1.15em;
+        width: 100%;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+      .op-brand-slot {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        white-space: nowrap;
+        opacity: 1;
+        transition: opacity 2s ease-in-out;
+      }
+      .op-brand-slot.is-hidden {
+        opacity: 0;
+        pointer-events: none;
       }
       .op-brand sup { font-size: 0.35em; vertical-align: super; opacity: 0.7; }
       .op-tagline {
@@ -384,19 +415,29 @@ function renderPermafleetCss (props) {
       @media (prefers-reduced-motion: reduce) {
         .op-hero-bg { animation: none; transform: scale(1.04); }
         .op-page a.op-cta { animation: none; }
+        .op-brand-slot { transition: none; }
+        .op-brand-slot.is-hidden { opacity: 0; visibility: hidden; }
       }`;
 }
 
 function renderPermafleetMainHtml (opts) {
+  const navHtml = (opts.nav || [])
+    .map((item) => `<span class="site-nav-item"><a href="${escapeHtml(item.href)}">${item.label}</a></span>`)
+    .join('');
+  const goonBrand = opts.goonBrandHtml || 'GOON SQUAD<sup>&trade;</sup>';
+  const permaBrand = opts.heading || 'PERMAFLEET';
   return `<main id="operation-permafleet" class="op-page">
       <div class="op-shell">
         <div class="op-hero-bg" aria-hidden="true"></div>
         <div class="op-hero-scrim" aria-hidden="true"></div>
         <canvas id="permafleet-particles" class="op-particles" aria-hidden="true"></canvas>
-        <nav class="op-nav"><a href="/">&larr; Home</a> · <a href="${opts.dossierPath}">${opts.dossierLabel}</a></nav>
+        <nav class="op-nav site-nav">${navHtml}</nav>
         <div class="op-content">
           <p class="op-eyebrow">The PERMAFLEET Protectorate</p>
-          <h1 class="op-brand">${opts.heading}</h1>
+          <h1 class="op-brand" id="op-brand">
+            <span class="op-brand-slot" data-brand="goon">${goonBrand}</span>
+            <span class="op-brand-slot is-hidden" data-brand="perma" aria-hidden="true">${permaBrand}</span>
+          </h1>
           <p class="op-tagline">${opts.tagline}</p>
           <p class="op-intro">${opts.intro}</p>
           <section class="op-panel" aria-labelledby="permafleet-label">
@@ -442,6 +483,27 @@ function renderPermafleetScript (opts) {
       (function () {
         var page = document.getElementById('operation-permafleet');
         if (!page || page.style.display === 'none' || !page.style.display) return;
+
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var brandRoot = document.getElementById('op-brand');
+        if (brandRoot && !reduceMotion) {
+          var slots = brandRoot.querySelectorAll('.op-brand-slot');
+          if (slots.length >= 2) {
+            var brandIdx = 0;
+            window.setInterval(function () {
+              slots[brandIdx].classList.add('is-hidden');
+              slots[brandIdx].setAttribute('aria-hidden', 'true');
+              brandIdx = (brandIdx + 1) % slots.length;
+              slots[brandIdx].classList.remove('is-hidden');
+              slots[brandIdx].removeAttribute('aria-hidden');
+            }, 6500);
+          }
+        } else if (brandRoot && reduceMotion) {
+          var goon = brandRoot.querySelector('[data-brand="goon"]');
+          var perma = brandRoot.querySelector('[data-brand="perma"]');
+          if (goon) { goon.classList.remove('is-hidden'); goon.removeAttribute('aria-hidden'); }
+          if (perma) { perma.classList.add('is-hidden'); perma.setAttribute('aria-hidden', 'true'); }
+        }
 
         var GUILD_ID = ${JSON.stringify(String(opts.guildId))};
         var PERMAFLEET_ID = ${JSON.stringify(String(opts.channelId))};
